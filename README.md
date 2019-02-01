@@ -1,5 +1,9 @@
 # Classifier selection
 
+## Przydatne łącza
+
+- [https://deslib.readthedocs.io/en/latest/](https://deslib.readthedocs.io/en/latest/)
+
 ## Pliki
 
 - `ARFF.py` — prymitywny parser plików ARFF,
