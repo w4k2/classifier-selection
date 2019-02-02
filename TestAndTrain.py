@@ -4,6 +4,7 @@ import time
 import csv
 from sklearn import neural_network
 from deslib.des import KNORAE
+from sklearn.metrics import f1_score
 
 class TestAndTrain(object):
     """
@@ -107,7 +108,7 @@ class TestAndTrain(object):
 
         # Fitting the des techniques
         kne.fit(X_dsel, y_dsel)
-        des_score = kne.score(X, y)
+        des_score = f1_score(kne.predict(X), y)
 
         evaluation_time = time.time() - evaluation_time
 
