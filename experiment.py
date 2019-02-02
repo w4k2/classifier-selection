@@ -23,8 +23,10 @@ for filename in streams:
 
     # Wyrysuj i zapisz
     plt.figure(figsize=(8, 4))
-    plt.plot(learner.score_points, learner.scores)
+    plt.plot(learner.score_points, learner.scores, label='basic')
+    plt.plot(learner.score_points, learner.des_scores, label='des')
     plt.title(filename)
+    plt.legend()
     plt.ylim((0, 1))
     plt.savefig("figures/%s.png" % filename.split(".")[0])
     plt.savefig("foo.png")

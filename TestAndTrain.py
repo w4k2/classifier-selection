@@ -3,7 +3,7 @@ from sklearn import base
 import time
 import csv
 from sklearn import neural_network
-
+from deslib.des import KNORAE
 
 class TestAndTrain(object):
     """
@@ -53,6 +53,7 @@ class TestAndTrain(object):
         self.processed_chunks = 0
 
         self.scores = []
+        self.des_scores = []
         self.score_points = []
         self.training_times = []
         self.evaluation_times = []
@@ -96,11 +97,24 @@ class TestAndTrain(object):
 
         # Prepare evaluation chunk
         score = self.clf.score(X, y)
+
+        # Prepare DES technique
+        pool_classifiers = self.clf.ensemble_
+        kne = KNORAE(pool_classifiers, random_state=42)
+
+        # Prepare DSEL
+        X_dsel, y_dsel = self.previous_chunk
+
+        # Fitting the des techniques
+        kne.fit(X_dsel, y_dsel)
+        des_score = kne.score(X, y)
+
         evaluation_time = time.time() - evaluation_time
 
         # Collecting results
         self.score_points.append(self.processed_chunks * self.chunk_size)
         self.scores.append(score)
+        self.des_scores.append(des_score)
         self.evaluation_times.append(evaluation_time)
         self.training_times.append(self.training_time)
 
