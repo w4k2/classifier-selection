@@ -1,7 +1,6 @@
 """Learnerr module."""
 from sklearn import base
 import time
-import csv
 from sklearn import neural_network
 
 
@@ -35,7 +34,9 @@ class TestAndTrain(object):
 
     """
 
-    def __init__(self, stream, base_classifier=neural_network.MLPClassifier(),
+    def __init__(self,
+                 stream,
+                 base_classifier=neural_network.MLPClassifier(),
                  chunk_size=500):
         """Initializer."""
         self.base_classifier = base_classifier
