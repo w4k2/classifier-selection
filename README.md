@@ -6,18 +6,10 @@
 
 ## Pliki
 
-- `ARFF.py` — prymitywny parser plików ARFF,
+- `StreamGenerator.py` — prymitywny generator strumieni,
 - `DumbDelayPool.py` — przykładowa klasa prymitywnego klasyfikatora strumieniowego,
 - `experiment.py` — przykład przetwarzania z wykorzystaniem klasyfikatora *DumbDelayPool*,
 - `TestAndTrain.py` — moduł uczący.
-- `streams.txt` — lista wszystkich plików zawierających strumienie
-
-## Teczki
-
-- `streams` — strumienie w formacie ARFF:
-  - prefiks `id` to dryf inkrementacyjny
-  - prefiks `sd` to dryf nagły
-- `figures` — przykładowe wykresy przebiegu wygenerowane przez `experiment.py`
 
 ## Uwagi
 

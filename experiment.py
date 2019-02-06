@@ -1,33 +1,27 @@
-from ARFF import ARFF
 from DumbDelayPool import DumbDelayPool
 from TestAndTrain import TestAndTrain
+from StreamGenerator import StreamGenerator
 import matplotlib.pyplot as plt
 
-streams = open("streams.txt", "r").read().split("\n")[:-1]
+streams = {
+    "Sudden": StreamGenerator(n_features=4, drift="sudden", distribution=[0.3, 0.7]),
+    "Incremental": StreamGenerator(
+        n_features=4, drift="incremental", distribution=[0.3, 0.7]
+    ),
+}
 
-for filename in streams:
-    # Przedstaw się, strumieniu
-    print(filename)
+fig, ax = plt.subplots(2, 1, figsize=(8, 8))
 
-    # Wczytaj się, strumieniu
-    stream = ARFF("streams/" + filename)
-
-    # Zainicjalizuj się, klasyfikatorze
-    clf = DumbDelayPool(ensemble_size=10)
-
-    # Przygotuj się, module uczący, poznając strumień i estymator
+for i, stream_n in enumerate(streams):
+    stream = streams[stream_n]
+    clf = DumbDelayPool(ensemble_size=1)
     learner = TestAndTrain(stream, clf)
-
-    # Badaj
     learner.run()
 
     # Wyrysuj i zapisz
-    plt.figure(figsize=(8, 4))
-    plt.plot(learner.score_points, learner.scores)
-    plt.title(filename)
-    plt.ylim((0, 1))
-    plt.savefig("figures/%s.png" % filename.split(".")[0])
-    plt.savefig("foo.png")
+    ax[i].plot(learner.score_points, learner.scores)
+    ax[i].plot(learner.score_points, (stream.b % 2 == 0)[:-1])
+    ax[i].set_ylim((0, 1))
+    ax[i].set_title(stream_n)
 
-    # Zapomnij, wyrzuć z pamięci
-    stream.close()
+plt.savefig("foo.png")

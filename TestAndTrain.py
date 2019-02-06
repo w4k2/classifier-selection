@@ -34,16 +34,13 @@ class TestAndTrain(object):
 
     """
 
-    def __init__(self,
-                 stream,
-                 base_classifier=neural_network.MLPClassifier(),
-                 chunk_size=500):
+    def __init__(self, stream, base_classifier=neural_network.MLPClassifier()):
         """Initializer."""
         self.base_classifier = base_classifier
-        self.chunk_size = chunk_size
 
         # Loading dataset
         self.stream = stream
+        self.chunk_size = stream.chunk_size
 
         # Prepare to classification
         self._reset()
@@ -67,14 +64,14 @@ class TestAndTrain(object):
         while True:
             self._process_chunk()
             if self.stream.is_dry:
-                self.stream.close()
+                # self.stream.close()
                 break
 
     def _process_chunk(self):
         # Copy the old chunk used in the previous repetition and take a new one
         # from the stream.
         self.previous_chunk = self.chunk
-        self.chunk = self.stream.get_chunk(self.chunk_size)
+        self.chunk = self.stream.get_chunk()
         X, y = self.chunk
 
         # Test
