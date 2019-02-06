@@ -1,39 +1,63 @@
 from Method import Method
 from TestAndTrain import TestAndTrain
 from StreamGenerator import StreamGenerator
+from sklearn.neural_network import MLPClassifier
 import matplotlib.pyplot as plt
 
+streams = {}
+
+
 d = [0.3, 0.7]
-streams = {
-    "Sudden": StreamGenerator(
-        n_features=4, drift_type="sudden", distribution=d, n_chunks=50, random_state=0
-    ),
-    "Incremental": StreamGenerator(
-        n_features=4,
-        drift_type="incremental",
-        distribution=d,
-        n_chunks=50,
-        random_state=0,
-    ),
+chunk_size = 500
+n_chunks = 200
+n_features = 8
+n_drifts = 4
+
+class_seps = [0.0, 0.3, 0.6, 1.0]
+drift_types = ["incremental", "sudden"]
+
+rs = 0
+
+for class_sep in class_seps:
+    for drift_type in drift_types:
+        stream = StreamGenerator(
+            drift_type=drift_type,
+            random_state=rs
+            # distribution=d,
+            # n_chunks=n_chunks,
+            # n_features=n_features,
+            # n_drifts=n_drifts,
+            # class_sep=class_sep,
+        )
+        rs += 1
+        streams.update({str(stream): stream})
+
+
+clfs = {
+    "MET1": Method(ensemble_size=1),
+    "MET5": Method(ensemble_size=5),
+    "MLP": MLPClassifier(),
 }
 
-fig, ax = plt.subplots(2, 1, figsize=(8, 8))
 
 for i, stream_n in enumerate(streams):
+    plt.figure(figsize=(8, 4))
+
     stream = streams[stream_n]
-    clf = Method(ensemble_size=5)
-    learner = TestAndTrain(stream, clf)
-    learner.run()
+    plt.ylim((0, 1))
+    plt.title(stream)
 
-    # Wyrysuj i zapisz
-    ax[i].plot(learner.score_points, learner.scores)
-    ax[i].set_ylim((0, 1))
-    ax[i].set_title(stream_n)
-    # ax[i].plot(learner.score_points, (stream.concept_dominances % 2 == 0)[:-1])
-    # ax[i].plot(learner.score_points, stream.usage_curve[:-1] / stream.chunk_size)
+    for clfn in clfs:
+        clf = clfs[clfn]
+        learner = TestAndTrain(stream, clf)
+        learner.run()
 
-    print(stream.concept_usages)
+        # Wyrysuj i zapisz
+        plt.plot(learner.score_points, learner.scores, label=clfn)
+        print("![](figures/%s.png)\n" % stream)
 
-    stream.reset()
-
-plt.savefig("foo.png")
+        stream.reset()
+    plt.legend()
+    plt.savefig("foo.png")
+    plt.savefig("figures/%s.png" % stream)
+    plt.close()

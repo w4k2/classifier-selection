@@ -12,6 +12,7 @@ class StreamGenerator:
         n_features=8,
         distribution=[0.5, 0.5],
         n_drifts=4,
+        class_sep=1.0,
         drift_type="incremental",
         random_state=None,
     ):
@@ -23,6 +24,7 @@ class StreamGenerator:
 
         # Store concept parameters
         self.random_state = random_state
+        self.class_sep = class_sep
         self.n_concepts = self.n_drifts + 2
         self.distribution = distribution
         self.classes = np.array(range(len(self.distribution)))
@@ -34,6 +36,16 @@ class StreamGenerator:
         # Calculate processing variables
         self.reset()
         self.is_prepared = False
+
+    def __str__(self):
+        return "%s_rs%i_d%i_cs%i_f%i_%i" % (
+            "sd" if self.drift_type == "sudden" else "id",
+            self.random_state,
+            self.n_drifts,
+            int(self.class_sep * 100),
+            self.n_features,
+            int(self.chunk_size * self.n_chunks),
+        )
 
     def reset(self):
         self.is_dry = False
@@ -50,8 +62,10 @@ class StreamGenerator:
                 n_samples=self.samples_per_concept,
                 n_features=self.n_features,
                 n_classes=self.n_classes,
+                n_informative=self.n_features // 2,
+                n_redundant=self.n_features // 2,
                 weights=self.distribution,
-                class_sep=0.001,
+                class_sep=self.class_sep,
                 shuffle=True,
             )
             for i in range(self.n_concepts)
