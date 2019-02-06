@@ -20,7 +20,7 @@ for i, stream_n in enumerate(streams):
 
     # Wyrysuj i zapisz
     ax[i].plot(learner.score_points, learner.scores)
-    ax[i].plot(learner.score_points, (stream.b % 2 == 0)[:-1])
+    ax[i].plot(learner.score_points, (stream.concept_dominances % 2 == 0)[:-1])
     ax[i].set_ylim((0, 1))
     ax[i].set_title(stream_n)
 

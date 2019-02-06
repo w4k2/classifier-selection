@@ -34,9 +34,6 @@ class StreamGenerator:
         self.classes = np.array([0, 1])
 
     def prepare(self):
-        # print("prepare")
-        # Count samples per concept
-
         # Prepare concepts
         self.concepts = [
             make_classification(
@@ -50,6 +47,11 @@ class StreamGenerator:
             for i in range(self.n_concepts)
         ]
         self.concept_usages = np.zeros(self.n_concepts).astype(int)
+
+        # Establish dominant concept for every chunk
+        self.concept_dominances = np.linspace(
+            0, self.n_drifts + 1, self.n_chunks + 1
+        ).astype(int)[:-1]
 
         # Prepare usage curves
         if self.drift == "incremental":
@@ -68,10 +70,8 @@ class StreamGenerator:
                 )
             ).astype(int)[:-1]
 
-        self.b = np.linspace(0, self.n_drifts + 1, self.n_chunks + 1).astype(int)[:-1]
-
         if self.drift == "sudden":
-            self.a = (self.b * self.chunk_size) % (self.chunk_size * 2)
+            self.a = (self.concept_dominances * self.chunk_size) % (self.chunk_size * 2)
 
         # print(self.a)
         # print(self.b)
@@ -87,12 +87,12 @@ class StreamGenerator:
             self.prepare()
             self.is_prepared = True
 
-        step = self.b[self.chunks_generated]
-        first, second = (step, step + 1)
+        dominant = self.concept_dominances[self.chunks_generated]
+        first, second = (dominant, dominant + 1)
 
         if self.drift == "sudden":
-            if step % 2 == 0:
-                first, second = (step + 1, step)
+            if dominant % 2 == 0:
+                first, second = (dominant + 1, dominant)
         amount = self.a[self.chunks_generated]
 
         proportion = np.array([amount, self.chunk_size - amount])
