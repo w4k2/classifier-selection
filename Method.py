@@ -10,7 +10,8 @@ from sklearn import neighbors
 from sklearn.metrics import f1_score
 import numpy as np
 
-class DumbDelayPool(BaseEstimator, ClassifierMixin):
+
+class Method(BaseEstimator, ClassifierMixin):
     """
     DumbDelayPool.
 
@@ -23,7 +24,7 @@ class DumbDelayPool(BaseEstimator, ClassifierMixin):
 
     """
 
-    def __init__(self, ensemble_size=20):
+    def __init__(self, ensemble_size=5):
         """Initialization."""
         self.ensemble_size = ensemble_size
 
@@ -34,7 +35,7 @@ class DumbDelayPool(BaseEstimator, ClassifierMixin):
     # Fitting
     def fit(self, X, y):
         """Fitting."""
-        if not hasattr(self, '_base_clf'):
+        if not hasattr(self, "_base_clf"):
             self.set_base_clf()
 
         X, y = check_X_y(X, y)
@@ -51,7 +52,7 @@ class DumbDelayPool(BaseEstimator, ClassifierMixin):
 
     def partial_fit(self, X, y, classes=None):
         """Partial fitting."""
-        if not hasattr(self, '_base_clf'):
+        if not hasattr(self, "_base_clf"):
             self.set_base_clf()
         X, y = check_X_y(X, y)
         self.X_ = X
@@ -88,13 +89,15 @@ class DumbDelayPool(BaseEstimator, ClassifierMixin):
 
     def previous_decision_matrix(self):
         """Ensemble decision matrix for the previous chunk"""
-        return np.array([member_clf.predict(self.previous_X)
-                         for member_clf in self.ensemble_])
+        return np.array(
+            [member_clf.predict(self.previous_X) for member_clf in self.ensemble_]
+        )
 
     def manhattan_distance(self, X):
         """Manhattan distance from each new instance to the previous chunk instances"""
-        return np.array([np.sum(np.absolute(self.previous_X - instance), axis=1)
-                         for instance in X])
+        return np.array(
+            [np.sum(np.absolute(self.previous_X - instance), axis=1) for instance in X]
+        )
 
     def region_of_competence(self, manhattan_distance_matrix, n_neighbors=5):
         """ Region of competence based on Manhattan
@@ -103,14 +106,12 @@ class DumbDelayPool(BaseEstimator, ClassifierMixin):
 
     def ensemble_support_matrix(self, X):
         """ESM."""
-        return np.array([member_clf.predict_proba(X)
-                         for member_clf in self.ensemble_])
+        return np.array([member_clf.predict_proba(X) for member_clf in self.ensemble_])
 
     def predict_proba(self, X):
         """Aposteriori probabilities."""
         # Check is fit had been called
-        check_is_fitted(self, 'classes_')
-
+        check_is_fitted(self, "classes_")
 
         # Acumulate supports
         esm = self.ensemble_support_matrix(X)
@@ -120,12 +121,12 @@ class DumbDelayPool(BaseEstimator, ClassifierMixin):
     def predict(self, X):
         """Hard decision."""
         # Check is fit had been called
-        check_is_fitted(self, 'classes_')
+        check_is_fitted(self, "classes_")
 
         # Input validation
         X = check_array(X)
         if X.shape[1] != self.X_.shape[1]:
-            raise ValueError('number of features does not match')
+            raise ValueError("number of features does not match")
 
         supports = self.predict_proba(X)
         prediction = np.argmax(supports, axis=1)
