@@ -14,7 +14,7 @@ fig, ax = plt.subplots(2, 1, figsize=(8, 8))
 
 for i, stream_n in enumerate(streams):
     stream = streams[stream_n]
-    clf = DumbDelayPool(ensemble_size=1)
+    clf = DumbDelayPool(ensemble_size=5)
     learner = TestAndTrain(stream, clf)
     learner.run()
 

@@ -60,7 +60,21 @@ class DumbDelayPool(BaseEstimator, ClassifierMixin):
         if _check_partial_fit_first_call(self, classes):
             self.classes_ = classes
             self.ensemble_ = []
+            self.previous_X = self.X_
+            self.previous_y = self.y_
 
+        # Each clf prediction for previous chunk
+        # prev_decision_matrix = self.previous_decision_matrix()
+
+        # Manhattan distance from each test instance to the previous chunk
+        # manhattan_distance_matrix = self.manhattan_distance(X)
+
+        # Region of competence for each test instance
+        # competence_region = self.region_of_competence(manhattan_distance_matrix, n_neighbors=5)
+
+        # Copy the old chunk
+        self.previous_X = self.X_
+        self.previous_y = self.y_
 
         # Preparing and training new candidate
         self.classes_ = classes
@@ -71,6 +85,21 @@ class DumbDelayPool(BaseEstimator, ClassifierMixin):
         # Prune oldest
         if len(self.ensemble_) > self.ensemble_size:
             del self.ensemble_[0]
+
+    def previous_decision_matrix(self):
+        """Ensemble decision matrix for the previous chunk"""
+        return np.array([member_clf.predict(self.previous_X)
+                         for member_clf in self.ensemble_])
+
+    def manhattan_distance(self, X):
+        """Manhattan distance from each new instance to the previous chunk instances"""
+        return np.array([np.sum(np.absolute(self.previous_X - instance), axis=1)
+                         for instance in X])
+
+    def region_of_competence(self, manhattan_distance_matrix, n_neighbors=5):
+        """ Region of competence based on Manhattan
+        distance from each new instance to the previous chunk"""
+        return np.argsort(manhattan_distance_matrix)[:, :n_neighbors]
 
     def ensemble_support_matrix(self, X):
         """ESM."""
