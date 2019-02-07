@@ -76,6 +76,10 @@ class Method(BaseEstimator, ClassifierMixin):
         # Preparing and training new candidate
         self.classes_ = classes
         candidate_clf = base.clone(self._base_clf)
+
+        # Remove outliers
+        # X_wo_outliers, y_wo_outliers = self.remove_outliers(X, y)
+
         candidate_clf.fit(X, y)
         self.ensemble_.append(candidate_clf)
 
@@ -88,16 +92,34 @@ class Method(BaseEstimator, ClassifierMixin):
         # Prune all classifiers below f1 threshold
         self.prune_threshold(base_scores, threshold=0.94)
 
+    def remove_outliers(self, X, y):
+        y_processed = y.copy()
+        X_processed = X.copy()
+        # Calculate distance from each instance to the rest
+        manhattan_distance_matrix = self.manhattan_distance(X_processed, X_processed)
+        # Find 5 nearest neighbors based on distance
+        neighbors = self.region_of_competence(manhattan_distance_matrix, n_neighbors=6)
+        neighbors = neighbors[:, 1:]
+        # Get neighbors classes
+        neighbors_classes = y_processed[neighbors]
+        # Find outliers
+        outliers = np.where(np.sum(neighbors_classes-(1-y_processed).reshape(500,1), axis=1) == 0)[0]
+        # Remove outliers
+        for index in sorted(outliers, reverse=True):
+            X_processed = np.delete(X_processed, index, axis=0)
+            y_processed = np.delete(y_processed, index, axis=0)
+        return X_processed, y_processed
+
     def previous_decision_matrix(self):
         """Ensemble decision matrix for the previous chunk"""
         return np.array(
             [member_clf.predict(self.previous_X) for member_clf in self.ensemble_]
         )
 
-    def manhattan_distance(self, X):
-        """Manhattan distance from each new instance to the previous chunk instances"""
+    def manhattan_distance(self, X1, X2):
+        """Manhattan distance from each new instance in X1 to the X2 instances"""
         return np.array(
-            [np.sum(np.absolute(self.previous_X - instance), axis=1) for instance in X]
+            [np.sum(np.absolute(X2 - instance), axis=1) for instance in X1]
         )
 
     def region_of_competence(self, manhattan_distance_matrix, n_neighbors=5):
@@ -110,7 +132,7 @@ class Method(BaseEstimator, ClassifierMixin):
         prev_decision_matrix = self.previous_decision_matrix()
 
         # Manhattan distance from each test instance to the previous chunk
-        manhattan_distance_matrix = self.manhattan_distance(X)
+        manhattan_distance_matrix = self.manhattan_distance(X, self.previous_X)
 
         # Region of competence for each test instance
         competence_region = self.region_of_competence(manhattan_distance_matrix, n_neighbors=n_neighbors)
