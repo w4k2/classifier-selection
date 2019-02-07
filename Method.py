@@ -64,14 +64,10 @@ class Method(BaseEstimator, ClassifierMixin):
             self.previous_X = self.X_
             self.previous_y = self.y_
 
-        # Each clf prediction for previous chunk
-        # prev_decision_matrix = self.previous_decision_matrix()
+        # Do przemyślenia
+        # if len(self.ensemble_) > 1:
+        #     test = self.region_of_competence_predict(X, n_neighbors=5)
 
-        # Manhattan distance from each test instance to the previous chunk
-        # manhattan_distance_matrix = self.manhattan_distance(X)
-
-        # Region of competence for each test instance
-        # competence_region = self.region_of_competence(manhattan_distance_matrix, n_neighbors=5)
 
         # Copy the old chunk
         self.previous_X = self.X_
@@ -103,6 +99,21 @@ class Method(BaseEstimator, ClassifierMixin):
         """ Region of competence based on Manhattan
         distance from each new instance to the previous chunk"""
         return np.argsort(manhattan_distance_matrix)[:, :n_neighbors]
+
+    def region_of_competence_predict(self, X, n_neighbors=5):
+        # Each clf prediction for previous chunk
+        prev_decision_matrix = self.previous_decision_matrix()
+
+        # Manhattan distance from each test instance to the previous chunk
+        manhattan_distance_matrix = self.manhattan_distance(X)
+
+        # Region of competence for each test instance
+        competence_region = self.region_of_competence(manhattan_distance_matrix, n_neighbors=n_neighbors)
+
+        # Ni mom pojęcia co robie
+        matrix = competence_region[prev_decision_matrix, :]
+        # print(matrix.shape)
+        # print(matrix.argmin(axis=0))
 
     def ensemble_support_matrix(self, X):
         """ESM."""
