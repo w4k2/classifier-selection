@@ -82,8 +82,11 @@ class Method(BaseEstimator, ClassifierMixin):
         # Score base models
         base_scores = self.f1_score_base_classifiers(X, y)
 
-        # Pruning the worst classifer if ensemble size exceeded
+        # Prune the worst classifer if ensemble size exceeded
         self.prune_worst_classifier(base_scores)
+
+        # Prune all classifiers below f1 threshold
+        self.prune_threshold(base_scores, threshold=0.94)
 
     def previous_decision_matrix(self):
         """Ensemble decision matrix for the previous chunk"""
@@ -126,6 +129,14 @@ class Method(BaseEstimator, ClassifierMixin):
         """Prune the worst classifer if ensemble size exceeded"""
         if len(self.ensemble_) > self.ensemble_size:
             del self.ensemble_[base_models_scores.argmin()]
+
+    def prune_threshold(self, base_models_scores, threshold=0.55):
+        """Prune all classifiers below f1 threshold,
+        always leaves one clf"""
+        indices = np.argwhere(base_models_scores < threshold)
+        for index in sorted(indices.ravel(), reverse=True):
+            if len(self.ensemble_) > 1:
+                del self.ensemble_[index]
 
     def ensemble_support_matrix(self, X):
         """ESM."""
