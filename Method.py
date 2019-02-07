@@ -79,9 +79,11 @@ class Method(BaseEstimator, ClassifierMixin):
         candidate_clf.fit(X, y)
         self.ensemble_.append(candidate_clf)
 
-        # Prune oldest
-        if len(self.ensemble_) > self.ensemble_size:
-            del self.ensemble_[0]
+        # Score base models
+        base_scores = self.f1_score_base_classifiers(X, y)
+
+        # Pruning the worst classifer if ensemble size exceeded
+        self.prune_worst_classifier(base_scores)
 
     def previous_decision_matrix(self):
         """Ensemble decision matrix for the previous chunk"""
@@ -114,6 +116,16 @@ class Method(BaseEstimator, ClassifierMixin):
         matrix = competence_region[prev_decision_matrix, :]
         # print(matrix.shape)
         # print(matrix.argmin(axis=0))
+
+    def f1_score_base_classifiers(self, X, y):
+        return np.array(
+            [f1_score(y, member_clf.predict(X)) for member_clf in self.ensemble_]
+        )
+
+    def prune_worst_classifier(self, base_models_scores):
+        """Prune the worst classifer if ensemble size exceeded"""
+        if len(self.ensemble_) > self.ensemble_size:
+            del self.ensemble_[base_models_scores.argmin()]
 
     def ensemble_support_matrix(self, X):
         """ESM."""
