@@ -86,11 +86,11 @@ class Method(BaseEstimator, ClassifierMixin):
         # Score base models
         base_scores = self.f1_score_base_classifiers(X, y)
 
-        # Prune the worst classifer if ensemble size exceeded
-        self.prune_worst_classifier(base_scores)
-
         # Prune all classifiers below f1 threshold
-        self.prune_threshold(base_scores, threshold=0.94)
+        base_scores = self.prune_threshold(base_scores, threshold=0.94)
+
+        # Prune the worst classifer if ensemble size exceeded
+        _ = self.prune_worst_classifier(base_scores)
 
     def remove_outliers(self, X, y):
         y_processed = y.copy()
@@ -151,6 +151,9 @@ class Method(BaseEstimator, ClassifierMixin):
         """Prune the worst classifer if ensemble size exceeded"""
         if len(self.ensemble_) > self.ensemble_size:
             del self.ensemble_[base_models_scores.argmin()]
+            base_models_scores = np.delete(base_models_scores, base_models_scores.argmin(), axis=0)
+        # Return reduced scores list
+        return base_models_scores
 
     def prune_threshold(self, base_models_scores, threshold=0.55):
         """Prune all classifiers below f1 threshold,
@@ -159,6 +162,9 @@ class Method(BaseEstimator, ClassifierMixin):
         for index in sorted(indices.ravel(), reverse=True):
             if len(self.ensemble_) > 1:
                 del self.ensemble_[index]
+                base_models_scores = np.delete(base_models_scores, index, axis=0)
+        # Return reduced scores list
+        return base_models_scores
 
     def ensemble_support_matrix(self, X):
         """ESM."""
