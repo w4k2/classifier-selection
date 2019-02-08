@@ -7,8 +7,10 @@ from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sklearn.utils.multiclass import _check_partial_fit_first_call
 from sklearn import base
 from sklearn import neighbors
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, accuracy_score, balanced_accuracy_score
 import numpy as np
+
+measure = balanced_accuracy_score
 
 
 class Method(BaseEstimator, ClassifierMixin):
@@ -68,7 +70,6 @@ class Method(BaseEstimator, ClassifierMixin):
         # if len(self.ensemble_) > 1:
         #     test = self.region_of_competence_predict(X, n_neighbors=5)
 
-
         # Copy the old chunk
         self.previous_X = self.X_
         self.previous_y = self.y_
@@ -103,7 +104,9 @@ class Method(BaseEstimator, ClassifierMixin):
         # Get neighbors classes
         neighbors_classes = y_processed[neighbors]
         # Find outliers
-        outliers = np.where(np.sum(neighbors_classes-(1-y_processed).reshape(500,1), axis=1) == 0)[0]
+        outliers = np.where(
+            np.sum(neighbors_classes - (1 - y_processed).reshape(500, 1), axis=1) == 0
+        )[0]
         # Remove outliers
         for index in sorted(outliers, reverse=True):
             X_processed = np.delete(X_processed, index, axis=0)
@@ -118,9 +121,7 @@ class Method(BaseEstimator, ClassifierMixin):
 
     def manhattan_distance(self, X1, X2):
         """Manhattan distance from each new instance in X1 to the X2 instances"""
-        return np.array(
-            [np.sum(np.absolute(X2 - instance), axis=1) for instance in X1]
-        )
+        return np.array([np.sum(np.absolute(X2 - instance), axis=1) for instance in X1])
 
     def region_of_competence(self, manhattan_distance_matrix, n_neighbors=5):
         """ Region of competence based on Manhattan
@@ -135,7 +136,9 @@ class Method(BaseEstimator, ClassifierMixin):
         manhattan_distance_matrix = self.manhattan_distance(X, self.previous_X)
 
         # Region of competence for each test instance
-        competence_region = self.region_of_competence(manhattan_distance_matrix, n_neighbors=n_neighbors)
+        competence_region = self.region_of_competence(
+            manhattan_distance_matrix, n_neighbors=n_neighbors
+        )
 
         # Ni mom pojęcia co robie
         matrix = competence_region[prev_decision_matrix, :]
@@ -144,14 +147,16 @@ class Method(BaseEstimator, ClassifierMixin):
 
     def f1_score_base_classifiers(self, X, y):
         return np.array(
-            [f1_score(y, member_clf.predict(X)) for member_clf in self.ensemble_]
+            [measure(y, member_clf.predict(X)) for member_clf in self.ensemble_]
         )
 
     def prune_worst_classifier(self, base_models_scores):
         """Prune the worst classifer if ensemble size exceeded"""
         if len(self.ensemble_) > self.ensemble_size:
             del self.ensemble_[base_models_scores.argmin()]
-            base_models_scores = np.delete(base_models_scores, base_models_scores.argmin(), axis=0)
+            base_models_scores = np.delete(
+                base_models_scores, base_models_scores.argmin(), axis=0
+            )
         # Return reduced scores list
         return base_models_scores
 
@@ -196,4 +201,4 @@ class Method(BaseEstimator, ClassifierMixin):
         return self.classes_[prediction]
 
     def score(self, X, y):
-        return f1_score(y, self.predict(X))
+        return measure(y, self.predict(X))

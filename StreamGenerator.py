@@ -1,5 +1,6 @@
 from sklearn.datasets import make_classification
 import numpy as np
+import matplotlib.pyplot as plt
 
 DRIFT_TYPES = ("sudden", "incremental")
 
@@ -15,6 +16,7 @@ class StreamGenerator:
         class_sep=1.0,
         drift_type="incremental",
         random_state=None,
+        flip_y=0.01,
     ):
         # Store stream parameters
         self.chunk_size = chunk_size
@@ -32,18 +34,20 @@ class StreamGenerator:
         self.drift_type = drift_type
         self.n_classes = len(self.distribution)
         self.samples_per_concept = int(self.stream_length / (self.n_concepts - 1))
+        self.flip_y = flip_y
 
         # Calculate processing variables
         self.reset()
         self.is_prepared = False
 
     def __str__(self):
-        return "%s_rs%i_d%i_cs%i_f%i_%i" % (
+        return "%s_rs%i_d%i_cs%i_f%i_ln_%i_%i" % (
             "sd" if self.drift_type == "sudden" else "id",
             self.random_state,
             self.n_drifts,
             int(self.class_sep * 100),
             self.n_features,
+            int(self.flip_y * 100),
             int(self.chunk_size * self.n_chunks),
         )
 
@@ -66,7 +70,9 @@ class StreamGenerator:
                 n_redundant=self.n_features // 2,
                 weights=self.distribution,
                 class_sep=self.class_sep,
+                flip_y=self.flip_y,
                 shuffle=True,
+                shift=None,
             )
             for i in range(self.n_concepts)
         ]
@@ -132,5 +138,15 @@ class StreamGenerator:
         self.chunks_generated += 1
         if self.chunks_generated == self.n_chunks:
             self.is_dry = True
+
+        """ Chunk plotter
+        plt.figure(figsize=(4, 4))
+        plt.scatter(X[:, 0], X[:, 1], c=y, alpha=0.5)
+        plt.xlim((-10, 10))
+        plt.ylim((-10, 10))
+        plt.savefig("foo.png")
+        plt.savefig("chunks/c%04i.png" % self.chunks_generated)
+        plt.close()
+        """
 
         return X, y
