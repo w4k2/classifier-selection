@@ -19,6 +19,8 @@ def streams():
                         distribution=distribution,
                         random_state=random_state,
                         flip_y=flip_y,
+                        chunk_size=100,
+                        n_chunks=10,
                     )
                     streams.update({str(stream): stream})
 

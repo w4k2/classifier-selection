@@ -1,5 +1,5 @@
 """
-Dumb Delay Pool.
+Minority Driven Ensemble.
 """
 
 from sklearn.base import BaseEstimator, ClassifierMixin
@@ -15,7 +15,7 @@ measure = balanced_accuracy_score
 decision = ("basic", "min")
 
 
-class MethodAlternate(BaseEstimator, ClassifierMixin):
+class MDE(BaseEstimator, ClassifierMixin):
     """
     DumbDelayPool.
 
@@ -131,13 +131,8 @@ class MethodAlternate(BaseEstimator, ClassifierMixin):
             min_majority_support = np.min(majority_support, axis=0)
             prediction = min_majority_support.astype(int)
         elif self.decision == "basic":
-            # print(esm.shape)
             average_support = np.mean(esm, axis=0)
-            # print(average_support.shape)
             prediction = np.argmax(average_support, axis=1)
-            # print(prediction.shape)
-            # print(prediction)
-            # exit()
 
         return prediction
 

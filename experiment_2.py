@@ -1,26 +1,18 @@
-from Method import Method
-from MethodAlternate import MethodAlternate
-from DESlibStream import DESlibStream
-from TestAndTrain import TestAndTrain
-from Dumb import Dumb
-from sklearn.neural_network import MLPClassifier
+import csm
 import matplotlib.pyplot as plt
 import numpy as np
 import helper as h
 from tqdm import tqdm
 
-from deslib.des import KNORAE, KNORAU
-from deslib.dcs import Rank, LCA
-
 streams = h.streams()
 
 clfs = {
-    "MET_ALT": MethodAlternate(),
-    "KNORAE": DESlibStream(desMethod="KNORAE"),
-    "KNORAU": DESlibStream(desMethod="KNORAU"),
-    "Rank": DESlibStream(desMethod="Rank"),
-    "LCA": DESlibStream(desMethod="LCA"),
-    "Dumb": Dumb(),
+    "MDE": csm.MDE(decision="min", ensemble_size=3, alpha=0.05),
+    "MDEb": csm.MDE(decision="basic", ensemble_size=3, alpha=0.05),
+    "KNORAE": csm.DESlibStream(desMethod="KNORAE"),
+    "KNORAU": csm.DESlibStream(desMethod="KNORAU"),
+    "Rank": csm.DESlibStream(desMethod="Rank"),
+    "LCA": csm.DESlibStream(desMethod="LCA"),
 }
 
 
