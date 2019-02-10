@@ -12,7 +12,7 @@ class StreamGenerator:
         n_chunks=200,
         n_features=8,
         distribution=[0.5, 0.5],
-        n_drifts=4,
+        n_drifts=5,
         class_sep=1.0,
         drift_type="incremental",
         random_state=None,
@@ -41,13 +41,14 @@ class StreamGenerator:
         self.is_prepared = False
 
     def __str__(self):
-        return "%s_rs%i_d%i_cs%i_f%i_ln_%i_%i" % (
+        return "%s_rs%i_d%i_cs%i_f%i_ln_%i_i%i_%i" % (
             "sd" if self.drift_type == "sudden" else "id",
             self.random_state,
             self.n_drifts,
             int(self.class_sep * 100),
             self.n_features,
             int(self.flip_y * 100),
+            int(self.distribution[0] * 100),
             int(self.chunk_size * self.n_chunks),
         )
 

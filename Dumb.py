@@ -12,10 +12,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 measure = balanced_accuracy_score
-decision = ("basic", "min")
 
 
-class MethodAlternate(BaseEstimator, ClassifierMixin):
+class Dumb(BaseEstimator, ClassifierMixin):
     """
     DumbDelayPool.
 
@@ -28,11 +27,9 @@ class MethodAlternate(BaseEstimator, ClassifierMixin):
 
     """
 
-    def __init__(self, ensemble_size=5, alpha=0.2, decision="min"):
+    def __init__(self, ensemble_size=5):
         """Initialization."""
         self.ensemble_size = ensemble_size
-        self.alpha = alpha
-        self.decision = decision
 
     def set_base_clf(self, base_clf=neighbors.KNeighborsClassifier()):
         """Establish base classifier."""
@@ -56,25 +53,6 @@ class MethodAlternate(BaseEstimator, ClassifierMixin):
         # Return the classifier
         return self
 
-    def remove_outliers(self, X, y):
-        # Detect and remove outliers
-        out_clf = neighbors.KNeighborsClassifier(n_neighbors=6)
-        out_clf.fit(X, y)
-        out_pp = out_clf.predict_proba(X)
-
-        same_neighbors = (
-            (out_pp[tuple([range(len(y)), y])] - (1 / out_clf.n_neighbors))
-            * out_clf.n_neighbors
-        ).astype(int)
-
-        filter = same_neighbors > 3
-
-        # What if nothing left?
-        if len(np.unique(y[filter])) == 1:
-            filter[np.argmax(y == 0)] = True
-
-        return X[filter], y[filter]
-
     def partial_fit(self, X, y, classes=None):
         """Partial fitting."""
         if not hasattr(self, "_base_clf"):
@@ -87,27 +65,11 @@ class MethodAlternate(BaseEstimator, ClassifierMixin):
 
         self.X_, self.y_ = X, y
 
-        train_X, train_y = self.remove_outliers(X, y)
-
-        # Testing all models
-        scores = np.array([measure(y, clf.predict(X)) for clf in self.ensemble_])
-
-        # Pruning
-        if len(self.ensemble_) > 1:
-            alpha_good = scores > (0.5 + self.alpha)
-            # print(scores)
-            self.ensemble_ = [self.ensemble_[i] for i in np.where(alpha_good)[0]]
-
-        if len(self.ensemble_) > self.ensemble_size - 1:
-            worst = np.argmin(scores)
-            del self.ensemble_[worst]
-
         # Preparing and training new candidate
-        self.ensemble_.append(base.clone(self._base_clf).fit(train_X, train_y))
+        self.ensemble_.append(base.clone(self._base_clf).fit(self.X_, self.y_))
 
-        # print("ENSEMBLE OF ", len(self.ensemble_))
-
-        # print(len(self.ensemble_))
+        if len(self.ensemble_) > self.ensemble_size:
+            del self.ensemble_[0]
 
     def ensemble_support_matrix(self, X):
         """ESM."""
@@ -125,19 +87,8 @@ class MethodAlternate(BaseEstimator, ClassifierMixin):
             raise ValueError("number of features does not match")
 
         esm = self.ensemble_support_matrix(X)
-        # print(esm.shape)
-        if self.decision == "min":
-            majority_support = esm[:, :, 1]
-            min_majority_support = np.min(majority_support, axis=0)
-            prediction = min_majority_support.astype(int)
-        elif self.decision == "basic":
-            # print(esm.shape)
-            average_support = np.mean(esm, axis=0)
-            # print(average_support.shape)
-            prediction = np.argmax(average_support, axis=1)
-            # print(prediction.shape)
-            # print(prediction)
-            # exit()
+        average_support = np.mean(esm, axis=0)
+        prediction = np.argmax(average_support, axis=1)
 
         return prediction
 
