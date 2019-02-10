@@ -1,5 +1,9 @@
 # Classifier selection
 
+## DESlib tylko latest
+
+`pip install git+https://github.com/scikit-learn-contrib/DESlib`
+
 ## Przydatne łącza
 
 - [https://deslib.readthedocs.io/en/latest/](https://deslib.readthedocs.io/en/latest/)

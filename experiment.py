@@ -1,22 +1,26 @@
 from Method import Method
 from MethodAlternate import MethodAlternate
-from Dumb import Dumb
+from DESlibStream import DESlibStream
 from TestAndTrain import TestAndTrain
+from Dumb import Dumb
 from sklearn.neural_network import MLPClassifier
 import matplotlib.pyplot as plt
 import numpy as np
 import helper as h
 from tqdm import tqdm
 
-np.set_printoptions(suppress=True)
+from deslib.des import KNORAE, KNORAU
+from deslib.dcs import Rank, LCA
 
 streams = h.streams()
 
 clfs = {
-    "MIN": MethodAlternate(alpha=0.2, ensemble_size=5, decision="min"),
-    "BAS": MethodAlternate(alpha=0.2, ensemble_size=5, decision="basic"),
-    "E": Method(),
-    "DUMB": Dumb(),
+    "MET_ALT": MethodAlternate(),
+    "KNORAE": DESlibStream(desMethod="KNORAE"),
+    "KNORAU": DESlibStream(desMethod="KNORAU"),
+    "Rank": DESlibStream(desMethod="Rank"),
+    "LCA": DESlibStream(desMethod="LCA"),
+    "Dumb": Dumb(),
 }
 
 
@@ -24,7 +28,7 @@ for i, stream_n in tqdm(enumerate(streams), total=len(streams), ascii=True):
     plt.figure(figsize=(8, 4))
 
     stream = streams[stream_n]
-    results = np.zeros((6, stream.n_chunks - 1))
+    results = np.zeros((7, stream.n_chunks - 1))
     plt.ylim((0.4, 1))
     plt.title(stream)
 
@@ -41,11 +45,15 @@ for i, stream_n in tqdm(enumerate(streams), total=len(streams), ascii=True):
         stream.reset()
 
     np.savetxt(
-        "results/%s.csv" % stream, results.T, fmt="%.0f, %.3f, %.3f, %.3f, %.3f, %.3f"
+        "results/%s.csv" % stream,
+        results.T,
+        fmt="%.0f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f",
     )
 
     plt.legend()
     plt.savefig("foo.png")
-    plt.savefig("figures/%s.png" % stream)
+    # exit()
+    plt.savefig("figures-des/%s.png" % stream)
 
     plt.close()
+    exit()
