@@ -3,20 +3,67 @@
 % Version 2.20 of 2017/10/04
 %
 \documentclass[runningheads]{llncs}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
 \input{_head}
 
 %\input{_base}
 
 \section{Introduction}
-\cite{cruz_deslib:2018}
+Klasyfikacja taka ciężka. Niezbalansowana jeszcze cięższa. A przy strumieniach to już w ogóle.
+
+To może selekcja klasyfikatorów \cite{cruz_deslib:2018}.
 
 \section{Method}
 
 \section{Set-up of experiments}
 
+\subsection{Datasets}
+\todo{Opis generatora}
+\todo{Przegląd zbiorów syntetycznych}
+\todo{Wypadałoby chyba jednak dodać te rzeczywiste, ale zróbmy to w następnym kroku}
+
+\subsection{Experiments}
+
+\subsubsection{Experiment 1 --- hyperparameters optimization}
+
+Ustalamy typowy strumien zawierający problem o dużej skali niezbalansowania
+(1:9) i szumie na poziomie udziału klasy mniejszościowej (.1). Testujemy
+uśrednioną miarę i zależność statystyczną przebiegów dla różnych wielkości
+komitetów i różnej wartości parametru odcięcia klasyfikatorów o przestarzałej
+granicy decyzyjnej. Testujemy osobno strumień z dryfami nagłymi i
+inkrementalnymi.
+
+Oczekiwania:
+- powiększanie komitetu początkowo stabilizuje jakość, ale z czasem degraduje
+zdolność do reakcji na dryf koncepcji,
+- zwiększanie progu odcięcia początkowo kompensuje spowolnienie reakcji na
+dryf, ale z czasem wpływa negatywnie na stabilność jakości.
+- obie wartości powinny być relatywnie niskie.
+- czas trwania badań to około pół godziny.
+
+\subsubsection{Experiment 2 --- comparative analysis of classifier selection methods}
+
 \section{Experimental evaluation}
 
+\subsubsection{Experiment 1 --- hyperparameters optimization}
+
+Wyniki na Figure \ref{fig:experiment_1}.
+
+\begin{figure}[hbt]
+	\centering
+	\includegraphics[width=.86\textwidth]{../figures/experiment_1}
+	\caption{Podpis}
+	\label{fig:experiment_1}
+\end{figure}
+
+Do dalszych badań wybrano komitet trzech klasyfikatorów i parametr alpha .05.
+
+\subsubsection{Experiment 2 --- comparative analysis of classifier selection methods}
+
 \section{Conclusions}
+
+Jest super, akurat dla takich wspaniale nietypowych danych, które wcale nie są takie nietypowe.
 
 \section*{Acknowledgement}
 
