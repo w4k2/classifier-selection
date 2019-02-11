@@ -12,6 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from deslib.des import KNORAE, KNORAU
 from deslib.dcs import Rank, LCA
+from imblearn.over_sampling import RandomOverSampler
 
 measure = balanced_accuracy_score
 
@@ -126,6 +127,9 @@ class DESlibStream(BaseEstimator, ClassifierMixin):
 
         X_dsel = self.previous_X
         y_dsel = self.previous_y
+
+        ros = RandomOverSampler(random_state=42)
+        X_dsel, y_dsel = ros.fit_resample(X_dsel, y_dsel)
 
         if self.desMethod == "KNORAE":
             des = KNORAE(self.ensemble_, random_state=42)
