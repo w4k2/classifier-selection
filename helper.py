@@ -5,10 +5,10 @@ def clfs():
     return {
         "MDE": csm.MDE(decision="min", ensemble_size=3, alpha=0.05),
         "MDEb": csm.MDE(decision="basic", ensemble_size=3, alpha=0.05),
-        "KNORAE": csm.DESlibStream(desMethod="KNORAE"),
-        "KNORAU": csm.DESlibStream(desMethod="KNORAU"),
-        "Rank": csm.DESlibStream(desMethod="Rank"),
-        "LCA": csm.DESlibStream(desMethod="LCA"),
+        "KNORAE": csm.DESlibStream(desMethod="KNORAE", ensemble_size=3),
+        "KNORAU": csm.DESlibStream(desMethod="KNORAU", ensemble_size=3),
+        "Rank": csm.DESlibStream(desMethod="Rank", ensemble_size=3),
+        "LCA": csm.DESlibStream(desMethod="LCA", ensemble_size=3),
     }
 
 
