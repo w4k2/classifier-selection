@@ -14,7 +14,7 @@ alphas = (0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3)
 p = 0.05
 
 print(results.shape)
-fig, ax = plt.subplots(1, 2, figsize=(12, 6))
+fig, ax = plt.subplots(1, 2, figsize=(10, 5))
 for i, drift_type in enumerate(drift_types):
     print(drift_type)
     subresults = results[i, :, :]
@@ -49,4 +49,6 @@ for i, drift_type in enumerate(drift_types):
     plt.xticks(range(len(alphas)), alphas)
     plt.yticks(range(len(ensemble_sizes)), ensemble_sizes)
 
+plt.tight_layout()
 plt.savefig("figures/experiment_1.png")
+plt.savefig("figures/experiment_1.eps")
