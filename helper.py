@@ -1,4 +1,15 @@
-from StreamGenerator import StreamGenerator
+import csm
+
+
+def clfs():
+    return {
+        "MDE": csm.MDE(decision="min", ensemble_size=3, alpha=0.05),
+        "MDEb": csm.MDE(decision="basic", ensemble_size=3, alpha=0.05),
+        "KNORAE": csm.DESlibStream(desMethod="KNORAE"),
+        "KNORAU": csm.DESlibStream(desMethod="KNORAU"),
+        "Rank": csm.DESlibStream(desMethod="Rank"),
+        "LCA": csm.DESlibStream(desMethod="LCA"),
+    }
 
 
 def streams():
@@ -14,13 +25,11 @@ def streams():
         for distribution in distributions:
             for random_state in random_states:
                 for flip_y in label_noises:
-                    stream = StreamGenerator(
+                    stream = csm.StreamGenerator(
                         drift_type=drift_type,
                         distribution=distribution,
                         random_state=random_state,
                         flip_y=flip_y,
-                        chunk_size=100,
-                        n_chunks=10,
                     )
                     streams.update({str(stream): stream})
 
