@@ -80,3 +80,6 @@ target/
 .DS_Store
 
 work.py
+
+foo.png
+bar.png
