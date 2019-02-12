@@ -37,7 +37,7 @@ for i, drift_type in enumerate(drift_types):
                 fontsize=12,
                 ha="center",
                 va="center",
-                alpha=1 if test else 0.5,
+                color="#000000" if test else "#555555",
             )
 
     print(mean_score, np.max(mean_score), ind)
@@ -50,5 +50,4 @@ for i, drift_type in enumerate(drift_types):
     plt.yticks(range(len(ensemble_sizes)), ensemble_sizes)
 
 plt.tight_layout()
-plt.savefig("figures/experiment_1.png")
 plt.savefig("figures/experiment_1.eps")

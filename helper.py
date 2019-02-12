@@ -1,4 +1,8 @@
 import csm
+import numpy as np
+from scipy.stats import ranksums
+
+p = 0.05
 
 
 def clfs():
@@ -34,3 +38,29 @@ def streams():
                     streams.update({str(stream): stream})
 
     return streams
+
+
+def tabrow(what, res):
+    mean = np.mean(res, axis=1)
+    std = np.std(res, axis=1)
+
+    width = len(mean)
+
+    leader = np.argmax(mean)
+
+    pvalues = np.array([ranksums(res[leader], res[i]).pvalue for i in range(width)])
+    dependences = pvalues > p
+
+    return (
+        what
+        + " & "
+        + (
+            " & ".join(
+                [
+                    "%s %.3f" % ("\\bfseries" if dependences[i] else "", mean[i])
+                    for i in range(width)
+                ]
+            )
+            + " \\\\"
+        )
+    )
