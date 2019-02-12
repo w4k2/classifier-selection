@@ -16,7 +16,7 @@ clfs = h.clfs()
 
 # Stream Variables
 drift_types = ["incremental", "sudden"]
-distributions = [[0.1, 0.9], [0.2, 0.8], [0.3, 0.7]]
+distributions = [[0.1, 0.9], [0.2, 0.8], [0.3, 0.7], [0.4, 0.6]]
 random_states = [1337, 666, 42]
 label_noises = [0.0, 0.1, 0.2, 0.3]
 
