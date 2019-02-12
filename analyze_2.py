@@ -20,6 +20,9 @@ distributions = [[0.1, 0.9], [0.2, 0.8], [0.3, 0.7]]
 random_states = [1337, 666, 42]
 label_noises = [0.0, 0.1, 0.2, 0.3]
 
+
+ldistributions = [[0.1, 0.9], [0.2, 0.8]]
+
 # Prepare storage for results
 chunk_size = next(iter(streams.values())).chunk_size
 n_chunks = next(iter(streams.values())).n_chunks
@@ -37,13 +40,13 @@ def gather_and_present(title, filename, streams, what):
     plt.figure(figsize=(8, 4))
     plt.ylim((0.5, 1))
     plt.xlim(0, 99500)
-    plt.xlabel("Instances processed")
-    plt.ylabel("Balanced accuracy")
+    plt.xlabel("Instances processed", fontsize=12)
+    plt.ylabel("Balanced accuracy", fontsize=12)
 
     plt.yticks(
         [0.5, 0.6, 0.7, 0.8, 0.9, 1],
         ["50%", "60%", "70%", "80%", "90%", "100%"],
-        fontsize=10,
+        fontsize=12,
     )
 
     xcoords = [16666 * i for i in range(1, 6)]
@@ -53,9 +56,8 @@ def gather_and_present(title, filename, streams, what):
     plt.xticks(
         [0, 25000, 50000, 75000, 100000],
         ["0", "25k", "50k", "75k", "100k"],
-        fontsize=10,
+        fontsize=12,
     )
-    plt.xticks(fontsize=9)
 
     for y in np.linspace(0.6, 0.9, 4):
         plt.plot(
@@ -88,7 +90,7 @@ def gather_and_present(title, filename, streams, what):
         plt.plot(score_points, overall[j], label=clfn)
 
     plt.legend(loc=9, ncol=6, columnspacing=1, frameon=False)
-    plt.title(title)
+    plt.title(title, fontsize=16)
     plt.tight_layout()
     # plt.savefig(filename + ".png")
     plt.savefig(filename + ".eps")
@@ -101,9 +103,10 @@ def gather_and_present(title, filename, streams, what):
 
 # Compare drift types
 print("Drift types")
+text_file = open("rows/drift_types.tex", "w")
 for drift_type in drift_types:
     streams = {}
-    for distribution in distributions:
+    for distribution in ldistributions:
         for random_state in random_states:
             for flip_y in label_noises:
                 stream = csm.StreamGenerator(
@@ -119,9 +122,13 @@ for drift_type in drift_types:
     what = drift_type
     tabrow = gather_and_present(title, filename, streams, what)
     print(tabrow)
+    text_file.write(tabrow + "\n")
+text_file.close()
+
 
 # Compare distributions
 print("Distributions")
+text_file = open("rows/distributions.tex", "w")
 for distribution in distributions:
     streams = {}
     for drift_type in drift_types:
@@ -141,14 +148,17 @@ for distribution in distributions:
 
     tabrow = gather_and_present(title, filename, streams, what)
     print(tabrow)
+    text_file.write(tabrow + "\n")
+text_file.close()
 
 # Compare distributions
 print("Label noise")
+text_file = open("rows/label_noises.tex", "w")
 for flip_y in label_noises:
     streams = {}
     for drift_type in drift_types:
         for random_state in random_states:
-            for distribution in distributions:
+            for distribution in ldistributions:
                 stream = csm.StreamGenerator(
                     drift_type=drift_type,
                     distribution=distribution,
@@ -163,3 +173,5 @@ for flip_y in label_noises:
 
     tabrow = gather_and_present(title, filename, streams, what)
     print(tabrow)
+    text_file.write(tabrow + "\n")
+text_file.close()

@@ -3,6 +3,7 @@ prepare:
 
 populate:
 	cp -r figures ~/Dropbox/Aplikacje/Overleaf/Classifier\ selection\ for\ imbalanced\ data\ streams\ with\ Minority\ Driven\ Ensemble/
+	cp -r rows ~/Dropbox/Aplikacje/Overleaf/Classifier\ selection\ for\ imbalanced\ data\ streams\ with\ Minority\ Driven\ Ensemble/
 
 analyze:
 	python analyze_1.py

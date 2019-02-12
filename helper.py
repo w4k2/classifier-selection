@@ -52,7 +52,7 @@ def tabrow(what, res):
     dependences = pvalues > p
 
     return (
-        what
+        ("\\emph{%s}" % what)
         + " & "
         + (
             " & ".join(
