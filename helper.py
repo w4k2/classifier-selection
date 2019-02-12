@@ -18,7 +18,7 @@ def clfs():
 
 def streams():
     # Variables
-    distributions = [[0.1, 0.9], [0.2, 0.8], [0.3, 0.7]]
+    distributions = [[0.1, 0.9], [0.2, 0.8], [0.3, 0.7], [0.4, 0.7]]
     label_noises = [0.0, 0.1, 0.2, 0.3]
     drift_types = ["incremental", "sudden"]
     random_states = [1337, 666, 42]
