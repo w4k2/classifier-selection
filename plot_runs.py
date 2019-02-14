@@ -16,12 +16,10 @@ clfs = h.clfs()
 
 # Stream Variables
 drift_types = ["incremental", "sudden"]
-distributions = [[0.1, 0.9], [0.2, 0.8], [0.3, 0.7], [0.4, 0.6]]
+ldistributions = [[0.1, 0.9], [0.2, 0.8], [0.3, 0.7], [0.4, 0.6]]
 random_states = [1337, 666, 42]
 label_noises = [0.0, 0.1, 0.2, 0.3]
 
-
-ldistributions = [[0.1, 0.9], [0.2, 0.8]]
 
 # Prepare storage for results
 chunk_size = next(iter(streams.values())).chunk_size
@@ -94,6 +92,7 @@ def gather_and_present(title, filename, streams, what, e):
     plt.tight_layout()
     # plt.savefig(filename + ".png")
     plt.savefig(filename + ".eps")
+    plt.close()
 
     a = np.swapaxes(results_hypercube, 1, 0)
     res = np.reshape(a, (5, -1))
