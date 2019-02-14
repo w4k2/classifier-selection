@@ -30,11 +30,14 @@ class DESlibStream(BaseEstimator, ClassifierMixin):
 
     """
 
-    def __init__(self, ensemble_size=5, alpha=0.2, desMethod="KNORAE"):
+    def __init__(
+        self, ensemble_size=3, alpha=0.05, desMethod="KNORAE", oversampled=True
+    ):
         """Initialization."""
         self.ensemble_size = ensemble_size
         self.alpha = alpha
         self.desMethod = desMethod
+        self.oversampled = oversampled
 
     def set_base_clf(self, base_clf=neighbors.KNeighborsClassifier()):
         """Establish base classifier."""
@@ -128,8 +131,9 @@ class DESlibStream(BaseEstimator, ClassifierMixin):
         X_dsel = self.previous_X
         y_dsel = self.previous_y
 
-        ros = RandomOverSampler(random_state=42)
-        X_dsel, y_dsel = ros.fit_resample(X_dsel, y_dsel)
+        if self.oversampled:
+            ros = RandomOverSampler(random_state=42)
+            X_dsel, y_dsel = ros.fit_resample(X_dsel, y_dsel)
 
         if self.desMethod == "KNORAE":
             des = KNORAE(self.ensemble_, random_state=42)

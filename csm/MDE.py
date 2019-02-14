@@ -28,7 +28,7 @@ class MDE(BaseEstimator, ClassifierMixin):
 
     """
 
-    def __init__(self, ensemble_size=5, alpha=0.2, decision="min"):
+    def __init__(self, ensemble_size=3, alpha=0.05, decision="min"):
         """Initialization."""
         self.ensemble_size = ensemble_size
         self.alpha = alpha

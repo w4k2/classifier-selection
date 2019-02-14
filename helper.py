@@ -7,13 +7,27 @@ p = 0.05
 
 def clfs():
     return {
-        "MDE": csm.MDE(decision="min", ensemble_size=3, alpha=0.05),
-        "MDEb": csm.MDE(decision="basic", ensemble_size=3, alpha=0.05),
-        "KNORAE": csm.DESlibStream(desMethod="KNORAE", ensemble_size=3),
-        "KNORAU": csm.DESlibStream(desMethod="KNORAU", ensemble_size=3),
-        "Rank": csm.DESlibStream(desMethod="Rank", ensemble_size=3),
-        "LCA": csm.DESlibStream(desMethod="LCA", ensemble_size=3),
+        "MDE": csm.MDE(),
+        "KNORAE": csm.DESlibStream(desMethod="KNORAE"),
+        "KNORAU": csm.DESlibStream(desMethod="KNORAU"),
+        "Rank": csm.DESlibStream(desMethod="Rank"),
+        "LCA": csm.DESlibStream(desMethod="LCA"),
     }
+
+
+def clfs_nos():
+    return {
+        "MDE": csm.MDE(),
+        "KNORAE": csm.DESlibStream(desMethod="KNORAE", oversampled=False),
+        "KNORAU": csm.DESlibStream(desMethod="KNORAU", oversampled=False),
+        "Rank": csm.DESlibStream(desMethod="Rank", oversampled=False),
+        "LCA": csm.DESlibStream(desMethod="LCA", oversampled=False),
+    }
+
+
+def real_streams():
+    streams = ["elecNormNew"]
+    return streams
 
 
 def streams():
