@@ -34,7 +34,7 @@ v_s = [[0,0], [.5,-.5], [1,-.5]]
 
 B_s = []
 for i in range(3):
-    fig, ax = plt.subplots(1,1,figsize=(3,5))
+    fig, ax = plt.subplots(1,1,figsize=(3,3))
     X_ = np.copy(X)
     X_[y==0] = X[y==0] + v_s[i]
 
@@ -55,7 +55,7 @@ B = np.max(B_s, axis=0)
 print(B_s.shape)
 print(B.shape)
 
-fig, ax = plt.subplots(1,1,figsize=(3,5))
+fig, ax = plt.subplots(1,1,figsize=(3,3))
 h = .1
 xx, yy = np.meshgrid(np.arange(-3, 3.1, h),
                      np.arange(-3, 3.1, h))

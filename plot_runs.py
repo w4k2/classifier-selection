@@ -29,10 +29,10 @@ n_chunks = next(iter(streams.values())).n_chunks
 score_points = list(range(chunk_size, chunk_size * n_chunks, chunk_size))
 
 
-def gather_and_present(title, filename, streams, what):
+def gather_and_present(title, filename, streams, what, e):
     results_hypercube = np.zeros((len(streams), len(clfs), n_chunks - 1))
     for i, stream_n in enumerate(streams):
-        results = np.load("results/experiment_2/%s.npy" % stream_n)
+        results = np.load("results/experiment_%i/%s.npy" % (e,stream_n))
         results_hypercube[i] = results
 
     overall = np.mean(results_hypercube, axis=0)
@@ -103,75 +103,23 @@ def gather_and_present(title, filename, streams, what):
 
 # Compare drift types
 print("Drift types")
-text_file = open("rows/drift_types.tex", "w")
-for drift_type in drift_types:
-    streams = {}
-    for distribution in ldistributions:
-        for random_state in random_states:
-            for flip_y in label_noises:
-                stream = csm.StreamGenerator(
-                    drift_type=drift_type,
-                    distribution=distribution,
-                    random_state=random_state,
-                    flip_y=flip_y,
-                )
-                streams.update({str(stream): stream})
-
-    title = drift_type + " drift"
-    filename = "figures/experiment_2_%s" % drift_type
-    what = drift_type
-    tabrow = gather_and_present(title, filename, streams, what)
-    print(tabrow)
-    text_file.write(tabrow + "\n")
-text_file.close()
-
-
-# Compare distributions
-print("Distributions")
-text_file = open("rows/distributions.tex", "w")
-for distribution in distributions:
-    streams = {}
+for e in [2,3]:
     for drift_type in drift_types:
-        for random_state in random_states:
-            for flip_y in label_noises:
-                stream = csm.StreamGenerator(
-                    drift_type=drift_type,
-                    distribution=distribution,
-                    random_state=random_state,
-                    flip_y=flip_y,
-                )
-                streams.update({str(stream): stream})
+        for distribution in ldistributions:
+            for random_state in random_states:
+                for flip_y in label_noises:
+                    stream = csm.StreamGenerator(
+                        drift_type=drift_type,
+                        distribution=distribution,
+                        random_state=random_state,
+                        flip_y=flip_y,
+                    )
+                    streams = [stream]
 
-    title = "%i%% of minority class" % int(distribution[0] * 100)
-    what = "%.0f\\%%" % (distribution[0] * 100)
-    filename = "figures/experiment_2_d%i" % int(distribution[0] * 100)
+                    title = stream
+                    filename = "figures/run/%s_%i" % (stream, e)
+                    what = drift_type
+                    tabrow = gather_and_present(title, filename, streams, what, e)
 
-    tabrow = gather_and_present(title, filename, streams, what)
-    print(tabrow)
-    text_file.write(tabrow + "\n")
-text_file.close()
-
-# Compare distributions
-print("Label noise")
-text_file = open("rows/label_noises.tex", "w")
-for flip_y in label_noises:
-    streams = {}
-    for drift_type in drift_types:
-        for random_state in random_states:
-            for distribution in ldistributions:
-                stream = csm.StreamGenerator(
-                    drift_type=drift_type,
-                    distribution=distribution,
-                    random_state=random_state,
-                    flip_y=flip_y,
-                )
-                streams.update({str(stream): stream})
-
-    title = "%i%% of label noise" % int(flip_y * 100)
-    what = "%.0f\\%%" % (flip_y * 100)
-    filename = "figures/experiment_2_ln%i" % int(flip_y * 100)
-
-    tabrow = gather_and_present(title, filename, streams, what)
-    print(tabrow)
-    text_file.write(tabrow + "\n")
-text_file.close()
+                    print(stream)
+                    print(tabrow)
