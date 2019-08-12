@@ -16,8 +16,8 @@
 - `MDE.py`             — Minority Driven Ensemble classifier,
 - `TestAndTrain.py`    — learing module,
 - `experiment_1.py`    — Hyperparameters overview,
-- `experiment_2.py`    — MDE and DES w/o oversampling,
-- `experiment_3.py`    — MDE and DES w/ oversampling.
+- `experiment_2.py`    — MDE and DES w/ oversampling,
+- `experiment_3.py`    — MDE and DES w/o oversampling.
 
 <!--
 ## Uwagi
