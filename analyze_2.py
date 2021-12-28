@@ -5,10 +5,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import helper as h
 import csm
+import seaborn as sb
+from scipy.ndimage.filters import gaussian_filter1d
 
 np.set_printoptions(precision=3)
 p = 0.05
 
+cs = ["black", "red", "red", "blue", "blue"]
+# cs = ["red", "blue", "blue", "black", "black"]
+ls = ["-", "-", "--", "-", "--"]
 
 # Select streams and methods
 streams = h.streams()
@@ -26,7 +31,7 @@ ldistributions = [[0.1, 0.9], [0.2, 0.8]]
 # Prepare storage for results
 chunk_size = next(iter(streams.values())).chunk_size
 n_chunks = next(iter(streams.values())).n_chunks
-score_points = list(range(chunk_size, chunk_size * n_chunks, chunk_size))
+# score_points = list(range(chunk_size, chunk_size * n_chunks, chunk_size))
 
 
 def gather_and_present(title, filename, streams, what):
@@ -35,63 +40,38 @@ def gather_and_present(title, filename, streams, what):
         results = np.load("results/experiment_2/%s.npy" % stream_n)
         results_hypercube[i] = results
 
+    plt.figure(figsize=(8, 5))
+
     overall = np.mean(results_hypercube, axis=0)
-
-    plt.figure(figsize=(8, 4))
-    plt.ylim((0.5, 1))
-    plt.xlim(0, 99500)
-    plt.xlabel("Instances processed", fontsize=12)
-    plt.ylabel("Balanced accuracy", fontsize=12)
-
-    plt.yticks(
-        [0.5, 0.6, 0.7, 0.8, 0.9, 1],
-        ["50%", "60%", "70%", "80%", "90%", "100%"],
-        fontsize=12,
-    )
-
-    xcoords = [16666 * i for i in range(1, 6)]
-    for xc in xcoords:
-        plt.axvline(x=xc, c="#EECCCC", ls=":", lw=1)
-
-    plt.xticks(
-        [0, 25000, 50000, 75000, 100000],
-        ["0", "25k", "50k", "75k", "100k"],
-        fontsize=12,
-    )
-
-    for y in np.linspace(0.6, 0.9, 4):
-        plt.plot(
-            range(0, 100000),
-            [y] * len(range(0, 100000)),
-            "--",
-            lw=0.5,
-            color="#BBBBBB",
-            alpha=0.3,
-        )
-
-    plt.tick_params(
-        axis="both",
-        which="both",
-        bottom="off",
-        top="off",
-        labelbottom="on",
-        left="off",
-        right="off",
-        labelleft="on",
-    )
-
-    ax = plt.subplot(111)
-    ax.spines["top"].set_visible(False)
-    ax.spines["bottom"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.spines["left"].set_visible(False)
     for j, clfn in enumerate(clfs):
         clf = clfs[clfn]
-        plt.plot(score_points, overall[j], label=clfn)
+        val = gaussian_filter1d(overall[j], sigma=1, mode="nearest")
+        plt.plot(val, label=clfn, ls=ls[j], c=cs[j])
 
-    plt.legend(loc=9, ncol=6, columnspacing=1, frameon=False)
-    plt.title(title, fontsize=16)
+    plt.ylim((0.5, 1))
+    plt.xlim(0, 200)
+    plt.xticks(fontfamily="serif", fontsize=13)
+    plt.yticks(fontfamily="serif", fontsize=13)
+    plt.ylabel("BAC", fontfamily="serif", fontsize=14)
+    plt.xlabel("chunks", fontfamily="serif", fontsize=14)
+
+    # plt.yticks(
+    #     [0.5, 0.6, 0.7, 0.8, 0.9, 1],
+    #     ["50%", "60%", "70%", "80%", "90%", "100%"],
+    #     fontsize=12,
+    # )
+
+    # plt.xticks(
+    #     [0, 25000, 50000, 75000, 100000],
+    #     ["0", "25k", "50k", "75k", "100k"],
+    #     fontsize=12,
+    # )
+
+    plt.legend(loc=9, ncol=6, columnspacing=1, frameon=False, fontsize=12)
+    plt.title(title, fontsize=18, fontfamily="serif")
+    plt.grid(ls="--", color=(0.85, 0.85, 0.85))
     plt.tight_layout()
+    sb.despine(top=True, right=True, left=False, bottom=False)
     # plt.savefig(filename + ".png")
     plt.savefig(filename + ".eps")
 

@@ -10,7 +10,7 @@ def clfs():
         "MDE": csm.MDE(),
         "KNORAE": csm.DESlibStream(desMethod="KNORAE"),
         "KNORAU": csm.DESlibStream(desMethod="KNORAU"),
-        "Rank": csm.DESlibStream(desMethod="Rank"),
+        "DCS-Rank": csm.DESlibStream(desMethod="Rank"),
         "LCA": csm.DESlibStream(desMethod="LCA"),
     }
 
@@ -20,7 +20,7 @@ def clfs_nos():
         "MDE": csm.MDE(),
         "KNORAE": csm.DESlibStream(desMethod="KNORAE", oversampled=False),
         "KNORAU": csm.DESlibStream(desMethod="KNORAU", oversampled=False),
-        "Rank": csm.DESlibStream(desMethod="Rank", oversampled=False),
+        "DCS-Rank": csm.DESlibStream(desMethod="Rank", oversampled=False),
         "LCA": csm.DESlibStream(desMethod="LCA", oversampled=False),
     }
 

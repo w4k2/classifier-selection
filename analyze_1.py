@@ -2,7 +2,7 @@
 Hyperparameters overview
 """
 import numpy as np
-from scipy.stats import mannwhitneyu
+from scipy.stats import mannwhitneyu, ranksums
 import matplotlib.pyplot as plt
 
 np.set_printoptions(precision=3)
